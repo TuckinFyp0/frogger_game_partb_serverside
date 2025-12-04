@@ -22,7 +22,9 @@ public class MinerGameServerService implements Runnable {
 	public void run() {
 		try {
 			in = new Scanner(s.getInputStream());
-			processRequest( );
+
+            updateMinerPosition();
+			processRequest();
 			
 		} catch (IOException e){
 			e.printStackTrace();
@@ -70,22 +72,26 @@ public class MinerGameServerService implements Runnable {
 				miner.setX(miner.getX() + 50);
 				
 			}
-			
-			try (Socket s2 = new Socket("localhost", CLIENT_PORT);
-		         PrintWriter out = new PrintWriter(s2.getOutputStream(), true)) {
 
-		        String commandOut = "MINER " + miner.getX() + " " + miner.getY();
-		        System.out.println("Sending: " + commandOut);
-		        out.println(commandOut);
-
-		    } catch (IOException e) {
-		        e.printStackTrace();
-		        
-		    }
+            updateMinerPosition();
 
 		}
 			
 	}
+
+    private void updateMinerPosition() {
+        try (Socket s2 = new Socket("localhost", CLIENT_PORT);
+             PrintWriter out = new PrintWriter(s2.getOutputStream(), true)) {
+
+            String commandOut = "MINER " + miner.getX() + " " + miner.getY();
+            System.out.println("Sending: " + commandOut);
+            out.println(commandOut);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+
+        }
+    }
 		
 }
 

@@ -11,7 +11,7 @@ public class ServerPrep {
 
 	public static void main(String[] args) throws IOException {
 		
-		Miner miner = new Miner(212, 550, 150, 150, "minerFacingFront.png");
+		Miner miner = new Miner(212, 550, 150, 150);
 		
 		
 		Thread t1 = new Thread ( new Runnable () {
