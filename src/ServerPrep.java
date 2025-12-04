@@ -2,6 +2,8 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import javax.swing.JLabel;
+
 public class ServerPrep {
     
 	final static int SERVER_PORT = 5556;
@@ -10,6 +12,7 @@ public class ServerPrep {
 	public static void main(String[] args) throws IOException {
 		
 		Miner miner = new Miner(212, 550, 150, 150, "minerFacingFront.png");
+		
 		
 		Thread t1 = new Thread ( new Runnable () {
 			public void run ( ) {
