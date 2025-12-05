@@ -13,10 +13,14 @@ public class MinerGameServerService implements Runnable {
 	private Socket s;
 	private Scanner in;
 	private Miner miner;
+    private MineCarts[] mineCartsArray;
 	
-	public MinerGameServerService(Socket s, Miner miner) {
+	public MinerGameServerService(Socket s, Miner miner, MineCarts[] mineCartsArray) {
 		this.s = s;
 		this.miner = miner;
+        this.mineCartsArray = mineCartsArray;
+
+        startMinecartThread();
 	}
 
 	public void run() {
@@ -76,6 +80,24 @@ public class MinerGameServerService implements Runnable {
             updateMinerPosition();
 
 		}
+
+        if (command.equals("RESETGAME")) {
+
+            miner.setY(550);
+            miner.setX(212);
+
+            mineCartsArray[0].setX(375);
+            mineCartsArray[0].setY(515);
+            mineCartsArray[1].setX(480);
+            mineCartsArray[1].setY(415);
+            mineCartsArray[2].setX(175);
+            mineCartsArray[2].setY(315);
+            mineCartsArray[3].setX(75);
+            mineCartsArray[3].setY(415);
+
+            updateMinerPosition();
+            updateMinerPosition();
+        }
 			
 	}
 
@@ -92,6 +114,54 @@ public class MinerGameServerService implements Runnable {
 
         }
     }
+
+    private void updateMinecarts() {
+        try (Socket s2 = new Socket("localhost", CLIENT_PORT);
+             PrintWriter out = new PrintWriter(s2.getOutputStream(), true)) {
+
+            for (int i = 0; i < mineCartsArray.length; i++) {
+                MineCarts cart = mineCartsArray[i];
+                String msg = "MINECART " + i + " " + cart.getX() + " " + cart.getY();
+                System.out.println("Sending: " + msg);
+                out.println(msg);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void moveMinecarts() {
+        for (MineCarts cart : mineCartsArray) {
+            int newX = cart.getX() + cart.getDirection() * cart.getSpeed() / 10;
+            cart.setX(newX);
+
+            if (cart.getDirection() > 0 && cart.getX() >= 600) {
+                cart.setX(-cart.getWidth());
+            } else if (cart.getDirection() < 0 && cart.getX() + cart.getWidth() <= 0) {
+                cart.setX(600);
+            }
+        }
+    }
+
+    private void startMinecartThread() {
+        Thread t = new Thread(() -> {
+            try {
+                while (true) {
+                    moveMinecarts();
+                    updateMinecarts();
+                    Thread.sleep(50);
+
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        t.start();
+    }
+
+
 		
 }
 
