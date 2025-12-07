@@ -14,12 +14,15 @@ public class MinerGameServerService implements Runnable {
 	private Scanner in;
 	private Miner miner;
     private MineCarts[] mineCartsArray;
+    private movingStones[] stonesArray;
 	
-	public MinerGameServerService(Socket s, Miner miner, MineCarts[] mineCartsArray) {
+	public MinerGameServerService(Socket s, Miner miner, MineCarts[] mineCartsArray, movingStones[] stonesArray) {
 		this.s = s;
 		this.miner = miner;
         this.mineCartsArray = mineCartsArray;
+        this.stonesArray = stonesArray;
 
+        startStonesThread();
         startMinecartThread();
 	}
 
@@ -150,6 +153,52 @@ public class MinerGameServerService implements Runnable {
                 while (true) {
                     moveMinecarts();
                     updateMinecarts();
+                    Thread.sleep(50);
+
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        t.start();
+    }
+
+    private void updateStones() {
+        try (Socket s2 = new Socket("localhost", CLIENT_PORT);
+             PrintWriter out = new PrintWriter(s2.getOutputStream(), true)) {
+
+            for (int i = 0; i < stonesArray.length; i++) {
+                movingStones stone = stonesArray[i];
+                String msg = "STONE " + i + " " + stone.getX() + " " + stone.getY();
+                System.out.println("Sending: " + msg);
+                out.println(msg);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void moveStones() {
+        for (movingStones stone : stonesArray) {
+            int newX = stone.getX() + stone.getDirection() * stone.getSpeed() / 10;
+            stone.setX(newX);
+
+            if (stone.getDirection() > 0 && stone.getX() >= 600) {
+                stone.setX(-stone.getWidth());
+            } else if (stone.getDirection() < 0 && stone.getX() + stone.getWidth() <= 0) {
+                stone.setX(600);
+            }
+        }
+    }
+
+    private void startStonesThread() {
+        Thread t = new Thread(() -> {
+            try {
+                while (true) {
+                    moveStones();
+                    updateStones();
                     Thread.sleep(50);
 
                 }

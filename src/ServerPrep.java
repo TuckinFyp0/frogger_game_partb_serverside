@@ -14,10 +14,25 @@ public class ServerPrep {
     private static MineCarts minecart_3;
     private static MineCarts minecart_4;
 
+    private static movingStones stone_1;
+    private static movingStones stone_2;
+    private static movingStones stone_3;
+    private static movingStones stone_4;
+
 	public static void main(String[] args) throws IOException {
 		
 		Miner miner = new Miner(212, 550, 150, 150);
         MineCarts[] mineCartsArray = {minecart_1, minecart_2, minecart_3, minecart_4};
+        mineCartsArray[0] = new MineCarts(375,515,80,80);
+        mineCartsArray[1] = new MineCarts(480,415,80,80);
+        mineCartsArray[2] = new MineCarts(175,315,80,80);
+        mineCartsArray[3] = new MineCarts(75,415,80,80);
+
+        movingStones[] stonesArray = {stone_1, stone_2, stone_3, stone_4};
+        stonesArray[0] = new movingStones(360,160,50,50);
+        stonesArray[1] = new movingStones(0,210,50,50);
+        stonesArray[2] = new movingStones(300,210,50,50);
+        stonesArray[3] = new movingStones(210,260,50,50);
 		
 		
 		Thread t1 = new Thread ( new Runnable () {
@@ -33,7 +48,7 @@ public class ServerPrep {
 							Socket s = server.accept();
 							System.out.println("client connected");
 							
-							MinerGameServerService myService = new MinerGameServerService (s, miner, mineCartsArray);
+							MinerGameServerService myService = new MinerGameServerService (s, miner, mineCartsArray, stonesArray);
 							Thread t2 = new Thread(myService);
 							t2.start();
 						}

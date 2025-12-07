@@ -25,7 +25,10 @@ public class movingStones implements Runnable {
     public int getWidth() { return width; }
     public int getHeight() { return height; }
 
+    public int getSpeed() {return speed;}
     public void setSpeed(int speed) { this.speed = speed; }
+
+    public int getDirection() {return direction; }
     public void setDirection(int direction) { this.direction = direction; }
 
     @Override
@@ -58,4 +61,5 @@ public class movingStones implements Runnable {
     public void stop() {
         moving = false;
     }
+
 }
